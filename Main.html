@@ -7,6 +7,7 @@
   <script type="text/javascript" src="babylon.custom.js"></script>
   <script type="text/javascript" src="FunctionCreateMatTex.js"></script>
   <link rel="stylesheet" type="text/css" href="Style.css">
+  <meta charset="UTF-8">
 </head>
 <body>
   <canvas id="renderCanvas"></canvas>
@@ -14,15 +15,13 @@
         var canvas = document.getElementById("renderCanvas");
         var engine = new BABYLON.Engine(canvas, true);
         var boy;
-        var freddy;
-        var freddys=[];
+        var miku;
         var jetpack;
         var coin;
         var coins=[];
         var ground;
         var material;
         var coinSpawned;
-        var freddySpawned;
         var count=0;
         var createScene = function () {
             var scene = new BABYLON.Scene(engine);
@@ -50,7 +49,7 @@
             topwall.position.y = 500;
             topwall.position.x = 0;
             var music = new BABYLON.Sound("radionoise", "music/radionoise.wav", scene, null, { loop: true, autoplay: true });
-            BABYLON.SceneLoader.ImportMesh("", "scenes/", "character-male-muscle.babylon", scene,
+            BABYLON.SceneLoader.ImportMesh("", "scenes/boy/", "character-male-muscle.babylon", scene,
             function (newMeshes2) {
               boy = newMeshes2[3];
               boy.name = "boy";
@@ -101,7 +100,7 @@
               }
             },
             );
-            BABYLON.SceneLoader.ImportMesh("", "scenes/", "coin.babylon", scene, function (newCoin) {
+            BABYLON.SceneLoader.ImportMesh("", "scenes/coin/", "coin.babylon", scene, function (newCoin) {
 
                 spawnCoin = function(minimumZ)
                 {
@@ -109,7 +108,7 @@
                   coinSpawned.scaling = new BABYLON.Vector3(4,4,4);
                   coinSpawned.position = new BABYLON.Vector3(
                                         Math.floor(Math.random() * 1000)-500,         //positionnya bakal diganti kalo map nya uda jdi
-                                        Math.floor(Math.random() * 1000),
+                                        Math.floor(Math.random() * 500),
                                         Math.floor(Math.random() * 1000)+minimumZ
                                       );
                   coins.push(coinSpawned);
@@ -153,7 +152,7 @@
                   console.log("COUNT = " + count);
                 }
             });
-            BABYLON.SceneLoader.ImportMesh("", "scenes/", "jetpack.babylon", scene,
+            BABYLON.SceneLoader.ImportMesh("", "scenes/jetpack/", "jetpack.babylon", scene,
               function (newMeshes) {
                   jetpack = newMeshes[0];
                   jetpack.scaling = new BABYLON.Vector3(1.8,1.8,1.8);
@@ -166,64 +165,29 @@
                   }
                 }
             );
-            BABYLON.SceneLoader.ImportMesh("", "scenes/", "haunted-freddy.babylon", scene,
-            function (newFreddy) {
-              spawnFreddy = function(minimumZ)
-              {
-                freddySpawned = newFreddy[0].clone();
-                freddySpawned.scaling = new BABYLON.Vector3(0.4,0.4,0.4);
-                freddySpawned.position = new BABYLON.Vector3(
-                                      Math.floor(Math.random() * 1000)-500,         //positionnya bakal diganti kalo map nya uda jdi
-                                      Math.floor(Math.random() * 1000),
-                                      Math.floor(Math.random() * 1000)+minimumZ
-                                    );
-                freddys.push(freddySpawned);
-              }
-              startfreddySpinAnimation = function()
-              {
-                freddys.forEach(
-                    function(spinnedFreddy){
-                      spinnedFreddy.addRotation(0,0,0.15);
-                    }
-                );
-              }
-              destroyPassedFreddy = function(boyZposition)
-              {
-                freddys.forEach(
-                    function(spinnedFreddy){
-                      if(spinnedFreddy.position.z + 500 < boyZposition)
-                      {
-                        freddys.splice(freddys.indexOf(spinnedFreddy),1);
-                        spinnedFreddy.dispose();
-                      }
-                    }
-                );
-              }
-              collisionFreddy = function(boy)
-              {
-                freddys.forEach(
-                  function(freddySpawned){
-                    if(freddySpawned.intersectsMesh(boy,true))
-                    {
-                      console.log("colliding. removing from array length: "+ freddy.length )
-                      freddys.splice(freddys.indexOf(freddySpawned),1);
-                      freddySpawned.dispose();
-                      console.log("removed. length: "+ freddy.length);
-                    }
-                  }
-                );
-              }
-              });
+            BABYLON.SceneLoader.ImportMesh("", "scenes/Miku/", "miku.babylon", scene,
+              function (newMeshes) {
+                  mikuBody = newMeshes[1];
+                  mikuHead = newMeshes[0];
+                  mikuBody.scaling =  new BABYLON.Vector3(10,10,10);
+                  mikuBody.position.y += 110;
+                  mikuBody.position.x += 60;
+                  mikuHead.scaling =  new BABYLON.Vector3(10,10,10);
+                  mikuHead.position.y += 140;
+                  mikuHead.position.z+=10;
+                },
+                startMikuSpinAnimation = function()
+                {
+                  mikuHead.addRotation(0,0.05,0);
+                  mikuHead.setPivotMatrix(BABYLON.Matrix.Translation(8, 0, 0));
+                }
+            );
+
           // spawn coin. working. tpi gua comment soalnya rusuh
          setInterval(function(){
             spawnCoin(boy.position.z);
           }
             , 5000);
-        setInterval(function(){
-             spawnFreddy(boy.position.z);
-          }
-            , 5000);
-
             // GUI Button
             var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI('UI', undefined, undefined, BABYLON.Texture.NEAREST_NEAREST);
             var exitBtn = BABYLON.GUI.Button.CreateSimpleButton("exitBtn", 'Exit');
@@ -267,8 +231,8 @@
               moveForward();
               setJetPackPosition(getX(),getY(),getZ());
               startcoinSpinAnimation();
+              startMikuSpinAnimation();
               destroyPassedCoins(getZ());
-              // collisionFreddy(getBoy());
               collisionCoin(getBoy());
               var count=0;
 
