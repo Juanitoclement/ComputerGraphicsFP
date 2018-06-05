@@ -16,7 +16,8 @@
         var engine = new BABYLON.Engine(canvas, true);
         var boy;
         var miku;
-        var mikus=[];
+        var mikuHeads=[];
+        var mikuBodies=[];
         var jetpack;
         var coin;
         var coins=[];
@@ -114,7 +115,7 @@
             },
             );
             BABYLON.SceneLoader.ImportMesh("", "scenes/coin/", "coin.babylon", scene, function (newCoin) {
-
+                newCoin[0].position.y =100000;
                 spawnCoin = function(minimumZ)
                 {
                   coinSpawned = newCoin[0].clone();
@@ -161,8 +162,6 @@
                       }
                     }
                   );
-                  console.log(coins.length);
-                  console.log("COUNT = " + count);
                 }
             });
             BABYLON.SceneLoader.ImportMesh("", "scenes/jetpack/", "jetpack.babylon", scene,
@@ -179,37 +178,78 @@
                 }
             );
             BABYLON.SceneLoader.ImportMesh("", "scenes/Miku/", "miku.babylon", scene,
-
               function (newMeshes) {
-
-                  mikuBody = newMeshes[1];
-                  mikuHead = newMeshes[0];
-                  mikuBody.scaling =  new BABYLON.Vector3(10,10,10);
-                  mikuBody.position.y += 110;
-                  mikuBody.position.x += 60;
-                  mikuHead.scaling =  new BABYLON.Vector3(10,10,10);
-                  mikuHead.position.y += 140;
-                  mikuHead.position.z+=10;
-                spawnMiku = function(boyZposition){
-
-
-                }
+                  var size = newMeshes[0].getBoundingInfo().boundingBox.extendSize;
+                  var maxX = 500 - (20 * size.x);
+                  var minX = -500 + (20 * size.x);
+                  var maxY = 500 - (10*size.y);
+                  var minY = 25*size.y;
+                  newMeshes[0].position.y=10000;
+                  newMeshes[1].position.y=10000;
+               spawnMiku = function(boyZposition){
+                  mikuHeadSpawned = newMeshes[0].clone();
+                  mikuBodySpawned = newMeshes[1].clone();
+                  mikuHeadSpawned.scaling = new BABYLON.Vector3(10,10,10);
+                  mikuBodySpawned.scaling = new BABYLON.Vector3(10,10,10);
+                  var randomMikuXPosition = Math.floor(Math.random() * (maxX-minX) + minX);
+                  var randomMikuYposition = Math.floor(Math.random() * (maxY-minY) + minY);
+                  var randomMikuZPosition = Math.floor(Math.random() * 1000)+300 +boyZposition;
+                  mikuHeadSpawned.position = new BABYLON.Vector3(
+                                        randomMikuXPosition,         //positionnya bakal diganti kalo map nya uda jdi
+                                        randomMikuYposition,
+                                        randomMikuZPosition
+                                      );
+                  mikuBodySpawned.position = new BABYLON.Vector3(
+                                        randomMikuXPosition+50,
+                                        randomMikuYposition-35,
+                                        randomMikuZPosition-15
+                                      );
+                  mikuHeads.push(mikuHeadSpawned);
+                  mikuBodies.push(mikuBodySpawned);
+               }
                 startMikuSpinAnimation = function()
                 {
-                  mikuHead.addRotation(0,0.05,0);
-                  mikuHead.setPivotMatrix(BABYLON.Matrix.Translation(8, 0, 0));
+                  mikuHeads.forEach(
+                      function(spinningMiku){
+                        spinningMiku.setPivotMatrix(BABYLON.Matrix.Translation(8, 0, 0));
+                        spinningMiku.addRotation(0,0.1,0);
+                      }
+                  );
+                }
+                destroyPassedMikus = function(boyZposition)
+                {
+                  mikuHeads.forEach(
+                      function(miku){
+                        if(miku.position.z + 500< boyZposition)
+                        {
+                          mikuHeads.splice(mikuHeads.indexOf(miku),1);
+                          miku.dispose();
+                        }
+                      }
+                  );
+                  mikuBodies.forEach(
+                    function(miku)
+                    {
+                      if(miku.position.z + 500< boyZposition)
+                      {
+                        mikuBodies.splice(mikuBodies.indexOf(miku),1);
+                        miku.dispose();
+                      }
+                    }
+                  );
+
                 }
                 collisionMiku = function(boy)
                 {
-                  mikus.forEach(
+                  mikuHeads.forEach(
                     function(mikuSpawned){
                       if(mikuSpawned.intersectsMesh(boy,true))
                       {
-                        console.log("colliding. removing from array length: "+ mikus.length )
-                        mikus.splice(mikus.indexOf(mikuSpawned),1);
+                        var index=mikuHeads.indexOf(mikuSpawned)
+                        mikuBodies[index].dispose();
                         mikuSpawned.dispose();
-                        console.log("removed. length: "+ mikus.length);
-
+                        mikuHeads.splice(index,1);
+                        mikuBodies.splice(index,1);
                       }
                     }
                   );
@@ -221,8 +261,11 @@
           // spawn coin. working. tpi gua comment soalnya rusuh
          setInterval(function(){
             spawnCoin(boy.position.z);
-          }
-            , 5000);
+          }, Math.floor(Math.random()*5000)+5000); //spawn random between 5s to 10s
+
+         setInterval(function(){
+            spawnMiku(boy.position.z);
+          }, Math.floor(Math.random()*5000)+3000); //spawn random between 3s to 8s
             // GUI Button
             var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI('UI', undefined, undefined, BABYLON.Texture.NEAREST_NEAREST);
             var exitBtn = BABYLON.GUI.Button.CreateSimpleButton("exitBtn", 'Exit');
@@ -260,6 +303,8 @@
               startMikuSpinAnimation();
               destroyPassedCoins(getZ());
               collisionCoin(getBoy());
+              destroyPassedMikus(getZ());
+              collisionMiku(getBoy());
               var count=0;
 
               window.onkeydown = function(event){
