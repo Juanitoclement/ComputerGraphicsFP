@@ -4,10 +4,10 @@
   <title>Final Project</title>
     <!-- Juanito Clement Tanjung - 2001621611 -->
     <!--  Kenneth Wilson - 2001622476 -->
+  <meta charset="UTF-8">
   <script type="text/javascript" src="babylon.custom.js"></script>
   <script type="text/javascript" src="FunctionCreateMatTex.js"></script>
   <link rel="stylesheet" type="text/css" href="Style.css">
-  <meta charset="UTF-8">
 </head>
 <body>
   <canvas id="renderCanvas"></canvas>
@@ -34,7 +34,6 @@
           // gravity = new BABYLON.Vector3(0, -9.81, 0);
           // physicsEngine = new BABYLON.CannonJSPlugin();
           // scene.enablePhysics(gravity, physicsEngine);
-
         });
         var createScene = function () {
             var scene = new BABYLON.Scene(engine);
@@ -223,19 +222,9 @@
             spawnCoin(boy.position.z);
           }
             , 5000);
-            // GUI Button
-            var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI('UI', undefined, undefined, BABYLON.Texture.NEAREST_NEAREST);
-            var exitBtn = BABYLON.GUI.Button.CreateSimpleButton("exitBtn", 'Exit');
-            exitBtn.width = '250px';
-            exitBtn.height = '30px';
-            exitBtn.color = "black";
-            exitBtn.fontSize = 20;
-            exitBtn.thickness = 0;
-            exitBtn.background = "white";
-            advancedTexture.addControl(exitBtn);
-            exitBtn.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
-            exitBtn.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+
             // GUI Score
+            var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI('UI', undefined, undefined, BABYLON.Texture.NEAREST_NEAREST);
             var scoreTxt = new BABYLON.GUI.TextBlock();
             scoreTxt.text = "Coins : " + count;
             scoreTxt.color = "blue";
@@ -247,9 +236,6 @@
         }
 
         var scene = createScene();
-
-
-
           engine.runRenderLoop(run = function () {
           // scene.fogMode = BABYLON.Scene.FOGMODE_EXP;
           // scene.fogDensity = 0.0015;
@@ -279,7 +265,16 @@
                   paused=true;
                   engine.stopRenderLoop();
                   console.log(paused);
-                  window.alert('Paused Press P to Continue');
+                  if(window.alert("P Pressed [PAUSED] - Click OK to Continue"))
+                  {
+
+                      paused=true;
+                      engine.stopRenderLoop();
+                  }
+                  else{
+                    paused=false;
+                    engine.runRenderLoop(function() {run()} );
+                  }
                 }
                 else if(event.keyCode == 80&& paused==true){
                   paused=false;
