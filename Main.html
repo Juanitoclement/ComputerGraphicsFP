@@ -102,14 +102,14 @@
             },
             );
             BABYLON.SceneLoader.ImportMesh("", "scenes/", "coin.babylon", scene, function (newCoin) {
-
+                newCoin[0].scaling = new BABYLON.Vector3(5,5,5);
                 spawnCoin = function(minimumZ)
                 {
                   coinSpawned = newCoin[0].clone();
                   coinSpawned.scaling = new BABYLON.Vector3(4,4,4);
                   coinSpawned.position = new BABYLON.Vector3(
                                         Math.floor(Math.random() * 1000)-500,         //positionnya bakal diganti kalo map nya uda jdi
-                                        Math.floor(Math.random() * 1000),
+                                        Math.floor(Math.random() * 500),
                                         Math.floor(Math.random() * 1000)+minimumZ
                                       );
                   coins.push(coinSpawned);
@@ -167,62 +167,20 @@
                 }
             );
             BABYLON.SceneLoader.ImportMesh("", "scenes/", "haunted-freddy.babylon", scene,
-            function (newFreddy) {
-              spawnFreddy = function(minimumZ)
-              {
-                freddySpawned = newFreddy[0].clone();
-                freddySpawned.scaling = new BABYLON.Vector3(0.4,0.4,0.4);
-                freddySpawned.position = new BABYLON.Vector3(
-                                      Math.floor(Math.random() * 1000)-500,         //positionnya bakal diganti kalo map nya uda jdi
-                                      Math.floor(Math.random() * 1000),
-                                      Math.floor(Math.random() * 1000)+minimumZ
-                                    );
-                freddys.push(freddySpawned);
-              }
-              startfreddySpinAnimation = function()
-              {
-                freddys.forEach(
-                    function(spinnedFreddy){
-                      spinnedFreddy.addRotation(0,0,0.15);
-                    }
-                );
-              }
-              destroyPassedFreddy = function(boyZposition)
-              {
-                freddys.forEach(
-                    function(spinnedFreddy){
-                      if(spinnedFreddy.position.z + 500 < boyZposition)
-                      {
-                        freddys.splice(freddys.indexOf(spinnedFreddy),1);
-                        spinnedFreddy.dispose();
-                      }
-                    }
-                );
-              }
-              collisionFreddy = function(boy)
-              {
-                freddys.forEach(
-                  function(freddySpawned){
-                    if(freddySpawned.intersectsMesh(boy,true))
-                    {
-                      console.log("colliding. removing from array length: "+ freddy.length )
-                      freddys.splice(freddys.indexOf(freddySpawned),1);
-                      freddySpawned.dispose();
-                      console.log("removed. length: "+ freddy.length);
-                    }
-                  }
-                );
-              }
-              });
-          // spawn coin. working. tpi gua comment soalnya rusuh
+              function (newMeshes) {
+                  freddy = newMeshes[0];
+                  freddy.scale = new BABYLON.Vector3(5,5,5);
+                }
+            );
+
          setInterval(function(){
             spawnCoin(boy.position.z);
           }
             , 5000);
-        setInterval(function(){
-             spawnFreddy(boy.position.z);
-          }
-            , 5000);
+        // setInterval(function(){
+        //      spawnFreddy(boy.position.z);
+        //   }
+        //     , 5000);
 
             // GUI Button
             var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI('UI', undefined, undefined, BABYLON.Texture.NEAREST_NEAREST);
