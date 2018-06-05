@@ -29,7 +29,6 @@
         var mikuSpawned;
         var count=0;
         var run;
-        var distance;
         var paused=false;
         document.addEventListener("DOMContentLoaded", function()
         {
@@ -49,8 +48,9 @@
             ground = new BABYLON.Mesh.CreateGround("ground",1000, 7000, 1, scene);
             ground.material = material;
             //Adding an Arc Rotate Camera (camera variable,sideways rotation, upwards/downwards rotation,distance )
-            var camera = new BABYLON.ArcRotateCamera("Camera", 300, 1.5, 700, BABYLON.Vector3.Zero(), scene);
-            camera.attachControl(canvas, false);
+            var camera = new BABYLON.ArcRotateCamera("Camera", 300, 1.5, 200, BABYLON.Vector3(0,0,0), scene);
+           camera.setPosition(new BABYLON.Vector3(0, 10, -300));
+            // camera.attachControl(canvas, false);
             // Move the light with the camera
             scene.registerBeforeRender(function () {
                 light.position = camera.position;
@@ -80,7 +80,6 @@
             BABYLON.SceneLoader.ImportMesh("", "scenes/boy/", "character-male-muscle.babylon", scene,
             function (newMeshes2) {
               boy = newMeshes2[3];
-              camera.lockedTarget = boy;
               boy.name = "boy";
               boy.scaling = new BABYLON.Vector3(0.4,0.4,0.4);
               boy.position.x = 0;
@@ -88,19 +87,19 @@
               boy.position.z =-400;
               moveRight = function ()
               {
-                boy.position.x += 2;
+                boy.position.x += 10;
               }
               moveLeft = function ()
               {
-                boy.position.x -= 2;
+                boy.position.x -= 10;
               }
               moveUp = function ()
               {
-                boy.position.y -= 2;
+                boy.position.y -= 10;
               }
               moveDown = function ()
               {
-                boy.position.y += 2;
+                boy.position.y += 10;
               }
               moveForward = function ()
               {
@@ -206,6 +205,7 @@
             BABYLON.SceneLoader.ImportMesh("", "scenes/jetpack/", "jetpack.babylon", scene,
               function (newMeshes) {
                   jetpack = newMeshes[0];
+                  camera.lockedTarget = jetpack;
                   jetpack.scaling = new BABYLON.Vector3(1.8,1.8,1.8);
                   jetpack.addRotation(-Math.PI/2,Math.PI/2,Math.PI/2);
 
@@ -308,7 +308,7 @@
             var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI('UI', undefined, undefined, BABYLON.Texture.NEAREST_NEAREST);
             var scoreTxt = new BABYLON.GUI.TextBlock();
             scoreTxt.text = "Coins : " + count;
-            scoreTxt.color = "blue";
+            scoreTxt.color = "yellow";
             scoreTxt.fontSize = 24;
             advancedTexture.addControl(scoreTxt);
             scoreTxt.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
@@ -330,7 +330,7 @@
               collideGround();
               collideLeftWall();
               collideRightWall();
-              collideTopWall
+              collideTopWall();
               destroyPassedMikus(getZ());
               collisionMiku(getBoy());
               var count=0;
