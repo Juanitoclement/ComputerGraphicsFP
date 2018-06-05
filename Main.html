@@ -27,6 +27,15 @@
         var count=0;
         var run;
         var paused=false;
+        document.addEventListener("DOMContentLoaded", function()
+        {
+          window.alert('Play the game');
+          // var material = createMatTex(scene);
+          // gravity = new BABYLON.Vector3(0, -9.81, 0);
+          // physicsEngine = new BABYLON.CannonJSPlugin();
+          // scene.enablePhysics(gravity, physicsEngine);
+
+        });
         var createScene = function () {
             var scene = new BABYLON.Scene(engine);
             //Adding a light
@@ -236,15 +245,6 @@
             scoreTxt.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
           return scene;
         }
-        document.addEventListener("DOMContentLoaded", function()
-        {
-          window.alert('Ready??');
-          // var material = createMatTex(scene);
-          // gravity = new BABYLON.Vector3(0, -9.81, 0);
-          // physicsEngine = new BABYLON.CannonJSPlugin();
-          // scene.enablePhysics(gravity, physicsEngine);
-
-        });
 
         var scene = createScene();
 
@@ -290,19 +290,6 @@
                 scene.render();
             }
         });
-
-
-        // engine.stopRenderLoop(function () {
-        //     if (engine.stopRenderLoop()) {
-        //
-        //       window.onkeydown = function(event){
-        //       if(event.keyCode==79){
-        //           engine.startRenderLoop(;
-        //         }
-        //       }
-        //         scene.render();
-        //     }
-        // });
 
         // Resize
         window.addEventListener("resize", function () {
