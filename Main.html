@@ -16,13 +16,17 @@
         var engine = new BABYLON.Engine(canvas, true);
         var boy;
         var miku;
+        var mikus=[];
         var jetpack;
         var coin;
         var coins=[];
         var ground;
         var material;
         var coinSpawned;
+        var mikuSpawned;
         var count=0;
+        var run;
+        var paused=false;
         var createScene = function () {
             var scene = new BABYLON.Scene(engine);
             //Adding a light
@@ -144,7 +148,7 @@
                         coinSpawned.dispose();
                         console.log("removed. length: "+ coins.length);
                         count= count+1;
-                        scoreTxt.text = "coin" + count;
+                        scoreTxt.text = "Coins : " + count;
                       }
                     }
                   );
@@ -166,7 +170,9 @@
                 }
             );
             BABYLON.SceneLoader.ImportMesh("", "scenes/Miku/", "miku.babylon", scene,
+
               function (newMeshes) {
+
                   mikuBody = newMeshes[1];
                   mikuHead = newMeshes[0];
                   mikuBody.scaling =  new BABYLON.Vector3(10,10,10);
@@ -175,12 +181,32 @@
                   mikuHead.scaling =  new BABYLON.Vector3(10,10,10);
                   mikuHead.position.y += 140;
                   mikuHead.position.z+=10;
-                },
+                spawnMiku = function(boyZposition){
+
+
+                }
                 startMikuSpinAnimation = function()
                 {
                   mikuHead.addRotation(0,0.05,0);
                   mikuHead.setPivotMatrix(BABYLON.Matrix.Translation(8, 0, 0));
                 }
+                collisionMiku = function(boy)
+                {
+                  mikus.forEach(
+                    function(mikuSpawned){
+                      if(mikuSpawned.intersectsMesh(boy,true))
+                      {
+                        console.log("colliding. removing from array length: "+ mikus.length )
+                        mikus.splice(mikus.indexOf(mikuSpawned),1);
+                        mikuSpawned.dispose();
+                        console.log("removed. length: "+ mikus.length);
+
+                      }
+                    }
+                  );
+
+                }
+              }
             );
 
           // spawn coin. working. tpi gua comment soalnya rusuh
@@ -203,7 +229,7 @@
             // GUI Score
             var scoreTxt = new BABYLON.GUI.TextBlock();
             scoreTxt.text = "Coins : " + count;
-            scoreTxt.color = "white";
+            scoreTxt.color = "blue";
             scoreTxt.fontSize = 24;
             advancedTexture.addControl(scoreTxt);
             scoreTxt.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
@@ -212,22 +238,22 @@
         }
         document.addEventListener("DOMContentLoaded", function()
         {
-          window.alert('Start the Game');
+          window.alert('Ready??');
           // var material = createMatTex(scene);
           // gravity = new BABYLON.Vector3(0, -9.81, 0);
           // physicsEngine = new BABYLON.CannonJSPlugin();
-          // ground = new BABYLON.Mesh.CreateGround("ground",1000, 1000, 1, scene); gua pindahin keatas gpp? soalnya gua butu ground diatas
-          // ground.material = material;
           // scene.enablePhysics(gravity, physicsEngine);
 
         });
 
         var scene = createScene();
 
-        engine.runRenderLoop(function () {
+
+
+          engine.runRenderLoop(run = function () {
           // scene.fogMode = BABYLON.Scene.FOGMODE_EXP;
           // scene.fogDensity = 0.0015;
-            if (scene) {
+            if (scene && paused==false) {
               moveForward();
               setJetPackPosition(getX(),getY(),getZ());
               startcoinSpinAnimation();
@@ -249,10 +275,34 @@
                 else if(event.keyCode==87){ //W
                   moveDown();
                 }
+                else if(event.keyCode==80 && paused==false){
+                  paused=true;
+                  engine.stopRenderLoop();
+                  console.log(paused);
+                  window.alert('Paused Press P to Continue');
+                }
+                else if(event.keyCode == 80&& paused==true){
+                  paused=false;
+                  engine.runRenderLoop(function() {run()} );
+                  console.log(paused);
+                }
               }
                 scene.render();
             }
         });
+
+
+        // engine.stopRenderLoop(function () {
+        //     if (engine.stopRenderLoop()) {
+        //
+        //       window.onkeydown = function(event){
+        //       if(event.keyCode==79){
+        //           engine.startRenderLoop(;
+        //         }
+        //       }
+        //         scene.render();
+        //     }
+        // });
 
         // Resize
         window.addEventListener("resize", function () {
