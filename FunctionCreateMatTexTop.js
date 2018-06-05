@@ -1,6 +1,6 @@
 function createMatTexTop(scene){
   var materialTex = new BABYLON.StandardMaterial("materialTex", scene);
-  materialTex.diffuseTexture = new BABYLON.Texture("side.jpg", scene);
+  materialTex.diffuseTexture = new BABYLON.Texture("sky.jpg", scene);
   materialTex.specularTexture = new BABYLON.Texture("sky.png", scene);
   materialTex.specularPower = 25
   //mat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
