@@ -7,6 +7,8 @@
   <meta charset="UTF-8">
   <script type="text/javascript" src="babylon.custom.js"></script>
   <script type="text/javascript" src="FunctionCreateMatTex.js"></script>
+  <script type="text/javascript" src="FunctionCreateMatTexSide.js"></script>
+  <script type="text/javascript" src="FunctionCreateMatTexTop.js"></script>
   <link rel="stylesheet" type="text/css" href="Style.css">
 </head>
 <body>
@@ -26,6 +28,7 @@
         var mikuSpawned;
         var count=0;
         var run;
+        var distance;
         var paused=false;
         document.addEventListener("DOMContentLoaded", function()
         {
@@ -40,36 +43,48 @@
             //Adding a light
             var light = new BABYLON.PointLight("Omni", new BABYLON.Vector3(20, 20, 100), scene);
             material = createMatTex(scene);
-            ground = new BABYLON.Mesh.CreateGround("ground",1000, 1000, 1, scene);
+            material2 = createMatTexSide(scene);
+            material3 = createMatTexTop(scene);
+            ground = new BABYLON.Mesh.CreateGround("ground",1000, 7000, 1, scene);
             ground.material = material;
             //Adding an Arc Rotate Camera (camera variable,sideways rotation, upwards/downwards rotation,distance )
-            var camera = new BABYLON.ArcRotateCamera("Camera", 300, 1, 450, BABYLON.Vector3.Zero(), scene);
+            var camera = new BABYLON.ArcRotateCamera("Camera", 300, 1.5, 700, BABYLON.Vector3.Zero(), scene);
             camera.attachControl(canvas, false);
             // Move the light with the camera
             scene.registerBeforeRender(function () {
                 light.position = camera.position;
             });
-            var rightwall = BABYLON.MeshBuilder.CreateBox("rightwall", {height: 500, width: 1, depth: 1000}, scene);
+            var rightwall = BABYLON.MeshBuilder.CreateBox("rightwall", {height: 1000, width: 1, depth: 7000}, scene);
             rightwall.position.y = 250;
             rightwall.position.x = 500;
+            rightwall.material = material2;
 
-            var leftwall = BABYLON.MeshBuilder.CreateBox("leftwall", {height: 500, width: 1, depth: 1000}, scene);
+            var leftwall = BABYLON.MeshBuilder.CreateBox("leftwall", {height: 1000, width: 1, depth: 7000}, scene);
             leftwall.position.y = 250;
             leftwall.position.x = -500;
+            leftwall.material = material2;
 
-            var topwall = BABYLON.MeshBuilder.CreateBox("topwall", {height: 1, width: 1000, depth: 1000}, scene);
+            var topwall = BABYLON.MeshBuilder.CreateBox("topwall", {height: 1, width: 1500, depth: 7000}, scene);
             topwall.position.y = 500;
             topwall.position.x = 0;
+            topwall.material = material3;
+
+            var frontWall = BABYLON.MeshBuilder.CreateBox("frontWall", {height: 1500, width: 1500, depth: 0}, scene);
+            frontWall.position.y = 0;
+            frontWall.position.x = 0;
+            frontWall.position.z = 1800;
+            frontWall.material = material;
+
             var music = new BABYLON.Sound("radionoise", "music/radionoise.wav", scene, null, { loop: true, autoplay: true });
             BABYLON.SceneLoader.ImportMesh("", "scenes/boy/", "character-male-muscle.babylon", scene,
             function (newMeshes2) {
               boy = newMeshes2[3];
+              camera.lockedTarget = boy;
               boy.name = "boy";
-              camera.lockedTarget = newMeshes2[3];
               boy.scaling = new BABYLON.Vector3(0.4,0.4,0.4);
-              boy.position.x = 100;
-              boy.position.y = 30;
-              boy.position.z =-500;
+              boy.position.x = 0;
+              boy.position.y = 100;
+              boy.position.z =-400;
               moveRight = function ()
               {
                 boy.position.x += 10;
@@ -88,10 +103,11 @@
               }
               moveForward = function ()
               {
-                boy.position.z += 1;
+                boy.position.z += 5;
                 rightwall.position.z += 1;
                 leftwall.position.z += 1;
                 topwall.position.z += 1;
+                frontWall.position.z += 1;
                 ground.position.z += 1;
               }
               getBoy = function()
@@ -109,6 +125,30 @@
               getZ = function()
               {
                 return boy.position.z;
+              }
+              collideGround = function ()
+              {
+                if(ground.intersectsMesh(boy,true)){
+                  return boy.position.y += 5;
+                }
+              }
+              collideLeftWall = function ()
+              {
+                if(leftwall.intersectsMesh(boy,true)){
+                  return boy.position.x += 5;
+                }
+              }
+              collideRightWall = function ()
+              {
+                if(rightwall.intersectsMesh(boy,true)){
+                  return boy.position.x -= 5;
+                }
+              }
+              collideTopWall = function ()
+              {
+                if(topwall.intersectsMesh(boy,true)){
+                  return boy.position.y -= 5;
+                }
               }
             },
             );
@@ -160,8 +200,6 @@
                       }
                     }
                   );
-                  console.log(coins.length);
-                  console.log("COUNT = " + count);
                 }
             });
             BABYLON.SceneLoader.ImportMesh("", "scenes/jetpack/", "jetpack.babylon", scene,
@@ -222,7 +260,6 @@
             spawnCoin(boy.position.z);
           }
             , 5000);
-
             // GUI Score
             var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI('UI', undefined, undefined, BABYLON.Texture.NEAREST_NEAREST);
             var scoreTxt = new BABYLON.GUI.TextBlock();
@@ -237,8 +274,8 @@
 
         var scene = createScene();
           engine.runRenderLoop(run = function () {
-          // scene.fogMode = BABYLON.Scene.FOGMODE_EXP;
-          // scene.fogDensity = 0.0015;
+          scene.fogMode = BABYLON.Scene.FOGMODE_EXP;
+          scene.fogDensity = 0.0015;
             if (scene && paused==false) {
               moveForward();
               setJetPackPosition(getX(),getY(),getZ());
@@ -246,6 +283,10 @@
               startMikuSpinAnimation();
               destroyPassedCoins(getZ());
               collisionCoin(getBoy());
+              collideGround();
+              collideLeftWall();
+              collideRightWall();
+              collideTopWall();
               var count=0;
 
               window.onkeydown = function(event){
@@ -264,7 +305,6 @@
                 else if(event.keyCode==80 && paused==false){
                   paused=true;
                   engine.stopRenderLoop();
-                  console.log(paused);
                   if(window.alert("P Pressed [PAUSED] - Click OK to Continue"))
                   {
 
@@ -279,7 +319,6 @@
                 else if(event.keyCode == 80&& paused==true){
                   paused=false;
                   engine.runRenderLoop(function() {run()} );
-                  console.log(paused);
                 }
               }
                 scene.render();
