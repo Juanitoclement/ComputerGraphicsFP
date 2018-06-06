@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Tangerine');
+
 html, body
 {
   width: 100%;
@@ -14,4 +16,38 @@ html, body
   padding: 0;
   margin: 0;
   touch-action: none;
+}
+
+*{
+    font-family: 'Tangerine', sans-serif;
+}
+
+#start {
+    background: url("start.jpg") no-repeat center fixed;
+    background-size: 100% auto;
+    text-align: center;
+}
+
+h1 {
+    font-size: 100px;
+    margin-top: 0;
+    padding-top: 15%;
+    color: white;
+}
+#renderCanvas{
+    touch-action : none;
+}
+
+.btn{
+    font-family : inherit;
+    font-size: 50px;
+    padding-left: 5%;
+    padding-right: 5%;
+    margin-bottom: 30%;
+}
+
+#end{
+    background: url("start.jpg") no-repeat center fixed;
+    background-size: 100% auto;
+    text-align: center;
 }

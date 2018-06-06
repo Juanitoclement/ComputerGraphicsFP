@@ -4,23 +4,12 @@
   <meta charset="UTF-8″>
   <title>Ghost Runner</title>
   <link rel="stylesheet" href="ghost.css" type="text/css" media="screen">
-  <script type="text/javascript" src="jquery.2.1.1.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="Style.css">
 </head>
 <body>
-  <div class="wrapper">
-    <div id="menu" class="main">
-      <div id="main">
-        <h1>Ghost Runner</h1>
-        <ul>
-          <li><a href="Main.html" class="button play">Start Game</a></li>
-        </ul>
-      </div>
-    </div>
-    <canvas id="canvas" width="800" height="480">
-      <p>You're browser does not support the required functionality to play this game.</p>
-      <p>Please update to a modern browser such as <a href="www.google.com/chrome/‎">Google Chrome</a> to play.</p>
-    </canvas>
-  </div>
-  <script type="text/javascript" src="ghost.js"></script>
+   <div id="start">
+       <h1>Ghost Runner</h1>
+       <input type="button" class="btn btn-default btn-lg" onclick="location.href= 'Main.html'" value="Play">
+   </div>
 </body>
 </html>

@@ -30,15 +30,11 @@
         var count=0;
         var run;
         var paused=false;
-        document.addEventListener("DOMContentLoaded", function()
-        {
-          window.alert('Play the game');
-          // var material = createMatTex(scene);
-          // gravity = new BABYLON.Vector3(0, -9.81, 0);
-          // physicsEngine = new BABYLON.CannonJSPlugin();
-          // scene.enablePhysics(gravity, physicsEngine);
-        });
         var createScene = function () {
+          document.addEventListener("DOMContentLoaded", function()
+          {
+            window.alert('(Press W A S D - To move your character) - (Press P to PAUSED the game)');
+          });
             var scene = new BABYLON.Scene(engine);
             //Adding a light
             var light = new BABYLON.PointLight("Omni", new BABYLON.Vector3(20, 20, 100), scene);
@@ -276,7 +272,6 @@
                       }
                     }
                   );
-
                 }
                 collisionMiku = function(boy)
                 {
@@ -353,7 +348,6 @@
                   engine.stopRenderLoop();
                   if(window.alert("P Pressed [PAUSED] - Click OK to Continue"))
                   {
-
                       paused=true;
                       engine.stopRenderLoop();
                   }
