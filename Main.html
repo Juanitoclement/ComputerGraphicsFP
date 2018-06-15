@@ -20,6 +20,10 @@
         var miku;
         var mikuHeads=[];
         var mikuBodies=[];
+        var grounds=[];
+        var tops=[];
+        var lefts=[];
+        var rights=[];
         var jetpack;
         var coin;
         var coins=[];
@@ -30,22 +34,25 @@
         var count=0;
         var run;
         var paused=false;
+        var loop = 0;
+        var speed=10;
         var createScene = function () {
           document.addEventListener("DOMContentLoaded", function()
           {
-            window.alert('(Press W A S D - To move your character) - (Press P to PAUSED the game)');
+            window.alert('Press W A S D - To move your character - Press P to PAUSED the game');
           });
             var scene = new BABYLON.Scene(engine);
             //Adding a light
-            var light = new BABYLON.PointLight("Omni", new BABYLON.Vector3(20, 20, 100), scene);
+            var light = new BABYLON.PointLight("Omni", new BABYLON.Vector3(20, 20, 100), scene); // lgiht bulb example
             material = createMatTex(scene);
             material2 = createMatTexSide(scene);
             material3 = createMatTexTop(scene);
             ground = new BABYLON.Mesh.CreateGround("ground",1000, 7000, 1, scene);
+            grounds.push(ground);
             ground.material = material;
             //Adding an Arc Rotate Camera (camera variable,sideways rotation, upwards/downwards rotation,distance )
             var camera = new BABYLON.ArcRotateCamera("Camera", 300, 1.5, 200, BABYLON.Vector3(0,0,0), scene);
-           camera.setPosition(new BABYLON.Vector3(0, 10, -300));
+           camera.setPosition(new BABYLON.Vector3(0, 10, -500));
             // camera.attachControl(canvas, false);
             // Move the light with the camera
             scene.registerBeforeRender(function () {
@@ -55,16 +62,19 @@
             rightwall.position.y = 250;
             rightwall.position.x = 500;
             rightwall.material = material2;
+            rights.push(rightwall);
 
             var leftwall = BABYLON.MeshBuilder.CreateBox("leftwall", {height: 1000, width: 1, depth: 7000}, scene);
             leftwall.position.y = 250;
             leftwall.position.x = -500;
             leftwall.material = material2;
+            lefts.push(leftwall);
 
-            var topwall = BABYLON.MeshBuilder.CreateBox("topwall", {height: 1, width: 1500, depth: 7000}, scene);
+            var topwall = BABYLON.MeshBuilder.CreateBox("topwall", {height: 1, width: 1000, depth: 7000}, scene);
             topwall.position.y = 500;
             topwall.position.x = 0;
             topwall.material = material3;
+            tops.push(topwall);
 
             var frontWall = BABYLON.MeshBuilder.CreateBox("frontWall", {height: 1500, width: 1500, depth: 0}, scene);
             frontWall.position.y = 0;
@@ -81,13 +91,72 @@
               boy.position.x = 0;
               boy.position.y = 100;
               boy.position.z =-400;
+              var animationBox = new BABYLON.Animation(
+                "myAnimation", "rotation.y",20,BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANTIMATIONLOOPMODE_CYCLE
+              );
+              var keys = [];
+              keys.push({
+                frame:0,
+                value:0
+              });
+              keys.push({
+                frame:1,
+                value:-0.04
+              });keys.push({
+                frame:2,
+                value:0.04
+              });
+              keys.push({
+                frame:3,
+                value:0
+              });
+              var animationBox2= new BABYLON.Animation(
+                "myAnimation", "rotation.y",20,BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANTIMATIONLOOPMODE_CYCLE
+              );
+              var keys2 = [];
+              keys2.push({
+                frame:0,
+                value:0
+              });
+              keys2.push({
+                frame:1,
+                value:0.04
+              });keys2.push({
+                frame:2,
+                value:-0.04
+              });
+              keys2.push({
+                frame:3,
+                value:0
+              });
+              animationBox.setKeys(keys);
+              animationBox2.setKeys(keys2);
+
+              boy.animations=[];
+              jetpack.animations=[];
+
               moveRight = function ()
               {
+
+                boy.animations.push(animationBox);
+                jetpack.animations.push(animationBox);
                 boy.position.x += 10;
+                scene.beginAnimation(boy,0,3,false);
+                scene.beginAnimation(jetpack,0,3,false);
+                boy.animations.pop();
+                jetpack.animations.pop();
+
+
               }
               moveLeft = function ()
               {
+                boy.animations.push(animationBox2);
+                jetpack.animations.push(animationBox2);
                 boy.position.x -= 10;
+                scene.beginAnimation(boy,0,3,false);
+                scene.beginAnimation(jetpack,0,3,false);
+                boy.animations.pop();
+                jetpack.animations.pop();
               }
               moveUp = function ()
               {
@@ -99,12 +168,38 @@
               }
               moveForward = function ()
               {
-                boy.position.z += 2;
+                boy.position.z += speed;
                 rightwall.position.z += 1;
                 leftwall.position.z += 1;
                 topwall.position.z += 1;
                 frontWall.position.z += 1;
                 ground.position.z += 1;
+                if(boy.position.z > loop) {
+                  loop += 2500;
+                  ground = new BABYLON.Mesh.CreateGround("ground",1000, 7000, 1, scene);
+                  leftwall = BABYLON.MeshBuilder.CreateBox("leftwall", {height: 1000, width: 1, depth: 7000}, scene);
+                  rightwall = BABYLON.MeshBuilder.CreateBox("rightwall", {height: 1000, width: 1, depth: 7000}, scene);
+                  topwall = BABYLON.MeshBuilder.CreateBox("topwall", {height: 1, width: 1000, depth: 7000}, scene);
+                  ground.position.z = boy.position.z + 5550 + loop/2;
+                  rightwall.position.z = boy.position.z + 5500 + loop/2;
+                  leftwall.position.z = boy.position.z + 5500 + loop/2;
+                  topwall.position.z = boy.position.z + 5500 + loop/2;
+                  rightwall.position.y = 250;
+                  rightwall.position.x = 500;
+                  leftwall.position.y = 250;
+                  leftwall.position.x = -500;
+                  topwall.position.y = 500;
+                  topwall.position.x = 0;
+                  ground.material = material;
+                  rightwall.material = material2;
+                  leftwall.material = material2;
+                  topwall.material = material3;
+                  grounds.push(ground);
+                  tops.push(topwall);
+                  lefts.push(leftwall);
+                  rights.push(rightwall);
+                  speed+=0.1;
+                }
               }
               getBoy = function()
               {
@@ -124,27 +219,43 @@
               }
               collideGround = function ()
               {
-                if(ground.intersectsMesh(boy,true)){
-                  return boy.position.y += 5;
-                }
+                grounds.forEach(
+                  function(ground){
+                    if(ground.intersectsMesh(boy,true)){
+                      return boy.position.y += 5;
+                    }
+                  }
+                );
               }
               collideLeftWall = function ()
               {
-                if(leftwall.intersectsMesh(boy,true)){
-                  return boy.position.x += 5;
-                }
+                lefts.forEach(
+                  function(leftwall){
+                    if(boy.position.x<-455){
+                      return boy.position.x += 5;
+                    }
+                  }
+                );
               }
               collideRightWall = function ()
               {
-                if(rightwall.intersectsMesh(boy,true)){
-                  return boy.position.x -= 5;
-                }
+                rights.forEach(
+                  function(rightwall){
+                    if(boy.position.x>460){
+                      return boy.position.x -= 5;
+                    }
+                  }
+                );
               }
               collideTopWall = function ()
               {
-                if(topwall.intersectsMesh(boy,true)){
-                  return boy.position.y -= 5;
-                }
+                tops.forEach(
+                  function(topwall){
+                    if(boy.position.y>365){
+                      return boy.position.y -= 10;
+                    }
+                  }
+                );
               }
             },
             );
@@ -157,7 +268,7 @@
                   coinSpawned.position = new BABYLON.Vector3(
                                         Math.floor(Math.random() * 1000)-500,         //positionnya bakal diganti kalo map nya uda jdi
                                         Math.floor(Math.random() * 500),
-                                        Math.floor(Math.random() * 1000)+minimumZ
+                                        Math.floor(Math.random() * 1000)+300+ minimumZ
                                       );
                   coins.push(coinSpawned);
                 }
@@ -187,12 +298,17 @@
                     function(coinSpawned){
                       if(coinSpawned.intersectsMesh(boy,true))
                       {
-                        console.log("colliding. removing from array length: "+ coins.length )
+                        // console.log("colliding. removing from array length: "+ coins.length )
                         coins.splice(coins.indexOf(coinSpawned),1);
                         coinSpawned.dispose();
-                        console.log("removed. length: "+ coins.length);
+                        // console.log("removed. length: "+ coins.length);
                         count= count+1;
                         scoreTxt.text = "Coins : " + count;
+                        scoreTxt2.text = "High Score : " + localStorage.getItem('highscore');
+                        if(count > localStorage.getItem('highscore')){
+                          localStorage.setItem('highscore', JSON.stringify(count));
+                          scoreTxt2.text = "High Score : " + localStorage.getItem('highscore');
+                        }
                       }
                     }
                   );
@@ -228,7 +344,7 @@
                   mikuBodySpawned.scaling = new BABYLON.Vector3(10,10,10);
                   var randomMikuXPosition = Math.floor(Math.random() * (maxX-minX) + minX);
                   var randomMikuYposition = Math.floor(Math.random() * (maxY-minY) + minY);
-                  var randomMikuZPosition = Math.floor(Math.random() * 1000)+300 +boyZposition;
+                  var randomMikuZPosition = Math.floor(Math.random() * 1000)+500 +boyZposition;
                   mikuHeadSpawned.position = new BABYLON.Vector3(
                                         randomMikuXPosition,         //positionnya bakal diganti kalo map nya uda jdi
                                         randomMikuYposition,
@@ -284,6 +400,7 @@
                         mikuSpawned.dispose();
                         mikuHeads.splice(index,1);
                         mikuBodies.splice(index,1);
+                        location.replace("gameover.html");
                       }
                     }
                   );
@@ -295,7 +412,7 @@
           // spawn coin. working. tpi gua comment soalnya rusuh
          setInterval(function(){
             spawnCoin(boy.position.z);
-          }, Math.floor(Math.random(5000)+3000));
+          }, Math.floor(200)+100);
           setInterval(function(){
                spawnMiku(boy.position.z);
              }, Math.floor(Math.random(5000)+5000));
@@ -308,13 +425,21 @@
             advancedTexture.addControl(scoreTxt);
             scoreTxt.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
             scoreTxt.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+            // GUI High Score
+            var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI('UI', undefined, undefined, BABYLON.Texture.NEAREST_NEAREST);
+            var scoreTxt2 = new BABYLON.GUI.TextBlock();
+            scoreTxt2.text = "High Score : " + localStorage.getItem('highscore');
+            scoreTxt2.color = "yellow";
+            scoreTxt2.fontSize = 24;
+            advancedTexture.addControl(scoreTxt2);
+            scoreTxt2.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP;
+            scoreTxt2.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
           return scene;
         }
-
         var scene = createScene();
           engine.runRenderLoop(run = function () {
           scene.fogMode = BABYLON.Scene.FOGMODE_EXP;
-          scene.fogDensity = 0.0015;
+          scene.fogDensity = 0.001;
             if (scene && paused==false) {
               moveForward();
               setJetPackPosition(getX(),getY(),getZ());
@@ -328,6 +453,7 @@
               collideTopWall();
               destroyPassedMikus(getZ());
               collisionMiku(getBoy());
+              // console.log(getX());
               var count=0;
 
               window.onkeydown = function(event){
@@ -364,7 +490,6 @@
                 scene.render();
             }
         });
-
         // Resize
         window.addEventListener("resize", function () {
             engine.resize();
